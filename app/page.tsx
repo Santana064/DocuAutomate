@@ -2,16 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [orgs, setOrgs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // 🔐 Auth guard
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) router.push("/login");
+    });
+  }, [router]);
+
+  // Load orgs
   const loadOrgs = async () => {
-    const { data } = await supabase.from("organizations").select("*").order("id", { ascending: false });
+    const { data } = await supabase
+      .from("organizations")
+      .select("*")
+      .order("id", { ascending: false });
+
     setOrgs(data || []);
   };
 
@@ -19,24 +32,30 @@ export default function Home() {
     loadOrgs();
   }, []);
 
+  // Create org with ownership
   const createOrg = async () => {
     if (!name) return;
 
     setLoading(true);
 
-    await supabase.from("organizations").insert([{ name }]);
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData.session?.user;
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    await supabase.from("organizations").insert([
+      {
+        name,
+        owner_id: user.id,
+      },
+    ]);
 
     setName("");
     await loadOrgs();
     setLoading(false);
-
-    const router = useRouter();
-
-useEffect(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    if (!data.session) router.push("/login");
-  });
-}, []);
   };
 
   return (
