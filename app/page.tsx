@@ -11,18 +11,29 @@ export default function Home() {
 
     const { data, error } = await supabase
       .from("organizations")
-      .insert([{ name: "My First Org" }])
+      .insert([{ name: "My first org" }])
       .select();
 
-    console.log(data, error);
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+
     setLoading(false);
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <button onClick={createOrg} disabled={loading}>
+    <main style={{ padding: 40 }}>
+      <button
+        onClick={createOrg}
+        style={{
+          padding: 12,
+          background: "white",
+          color: "black",
+          borderRadius: 8,
+          cursor: "pointer",
+        }}
+      >
         {loading ? "Creating..." : "Create organization"}
       </button>
-    </div>
+    </main>
   );
 }
