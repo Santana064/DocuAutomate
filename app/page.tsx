@@ -1,16 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
-  useEffect(() => {
-    supabase.from("test").select("*").then(console.log);
-  }, []);
+  const [loading, setLoading] = useState(false);
+
+  const createOrg = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("organizations")
+      .insert([{ name: "My First Org" }])
+      .select();
+
+    console.log(data, error);
+    setLoading(false);
+  };
 
   return (
     <div style={{ padding: 40 }}>
-      Supabase connected ✅
+      <button onClick={createOrg} disabled={loading}>
+        {loading ? "Creating..." : "Create organization"}
+      </button>
     </div>
   );
 }
