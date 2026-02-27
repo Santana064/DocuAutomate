@@ -1,39 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
+  const [name, setName] = useState("");
+  const [orgs, setOrgs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const loadOrgs = async () => {
+    const { data } = await supabase.from("organizations").select("*").order("id", { ascending: false });
+    setOrgs(data || []);
+  };
+
+  useEffect(() => {
+    loadOrgs();
+  }, []);
+
   const createOrg = async () => {
+    if (!name) return;
+
     setLoading(true);
 
-    const { data, error } = await supabase
-      .from("organizations")
-      .insert([{ name: "My first org" }])
-      .select();
+    await supabase.from("organizations").insert([{ name }]);
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-
+    setName("");
+    await loadOrgs();
     setLoading(false);
   };
 
   return (
-    <main style={{ padding: 40 }}>
-      <button
-        onClick={createOrg}
-        style={{
-          padding: 12,
-          background: "white",
-          color: "black",
-          borderRadius: 8,
-          cursor: "pointer",
-        }}
-      >
-        {loading ? "Creating..." : "Create organization"}
-      </button>
+    <main style={{ padding: 40, maxWidth: 600 }}>
+      <h1 style={{ fontSize: 24, marginBottom: 20 }}>DocuAutomate</h1>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <input
+          placeholder="Organization name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{
+            flex: 1,
+            padding: 10,
+            borderRadius: 8,
+            border: "1px solid #ccc",
+          }}
+        />
+
+        <button
+          onClick={createOrg}
+          style={{
+            padding: 10,
+            borderRadius: 8,
+            background: "white",
+            color: "black",
+            cursor: "pointer",
+          }}
+        >
+          {loading ? "Creating..." : "Create"}
+        </button>
+      </div>
+
+      <div style={{ marginTop: 30 }}>
+        {orgs.map((o) => (
+          <div key={o.id} style={{ padding: 10, borderBottom: "1px solid #222" }}>
+            {o.name}
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
