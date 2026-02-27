@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [name, setName] = useState("");
@@ -27,6 +29,14 @@ export default function Home() {
     setName("");
     await loadOrgs();
     setLoading(false);
+
+    const router = useRouter();
+
+useEffect(() => {
+  supabase.auth.getSession().then(({ data }) => {
+    if (!data.session) router.push("/login");
+  });
+}, []);
   };
 
   return (
