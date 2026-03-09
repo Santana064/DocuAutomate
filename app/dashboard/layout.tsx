@@ -1,33 +1,43 @@
-"use client";
-
-import Link from "next/link";
+import Link from "next/link"
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* Sidebar */}
-      <aside
+    <div style={{ display: "flex" }}>
+
+      <div
         style={{
-          width: 220,
-          padding: 20,
-          borderRight: "1px solid #222",
+          width: "200px",
+          borderRight: "1px solid #333",
+          padding: "20px",
         }}
       >
-        <h2 style={{ marginBottom: 20 }}>DocuAutomate</h2>
+        <h3>DocuAutomate</h3>
 
-        <nav style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/dashboard/organizations">Organizations</Link>
-          <Link href="/dashboard/documents">Documents</Link>
-        </nav>
-      </aside>
+        <div style={{ marginTop: "20px" }}>
+          <div>
+            <Link href="/dashboard">Dashboard</Link>
+          </div>
 
-      {/* Content */}
-      <div style={{ flex: 1, padding: 30 }}>{children}</div>
+          <div style={{ marginTop: "10px" }}>
+            <Link href="/dashboard/organizations">Organizations</Link>
+          </div>
+
+          <div style={{ marginTop: "10px" }}>
+            <Link href="/dashboard/documents">Documents</Link>
+          </div>
+
+          <div style={{ marginTop: "10px" }}>
+            <Link href="/dashboard/templates">Templates</Link>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "20px", flex: 1 }}>{children}</div>
+
     </div>
-  );
+  )
 }
